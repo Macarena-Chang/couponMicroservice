@@ -9,7 +9,6 @@ import ar.com.maca.api.couponMicroservice.models.Coupon;
 import java.util.*;
 
 
-@Repository
 public interface CouponRepository extends JpaRepository<Coupon, Long> {
     Coupon findByCode(String code);
 }
