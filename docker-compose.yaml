@@ -1,0 +1,70 @@
+# The version of Docker Compose file
+version: '3'
+
+# List of services
+services:
+  # Service for Product App
+  product-app:
+    # Container name for the service
+    container_name: product-app
+    # Docker image for the service
+    image: macarenachang/productservice
+    # Define the restart policy
+    restart: on-failure
+    # Map ports to the host machine
+    ports:
+      - 9090:9090
+    # Define environment variables
+    environment:
+      WAIT_HOSTS: mysql:3306
+    # Specify dependencies
+    depends_on:
+      - coupon-app
+      - docker-mysql
+
+
+
+  # Service for Coupon App
+  coupon-app:
+    # Container name for the service
+    container_name: coupon-app
+    # Docker image for the service
+    image: macarenachang/couponservice
+    # Define the restart policy
+    restart: on-failure
+    # Map ports to the host machine
+    ports:
+      - 9091:9091
+    # Define environment variables
+    environment:
+      WAIT_HOSTS: mysql:3306
+    # Specify dependencies
+    depends_on:
+     - docker-mysql
+
+
+  # Service for MySQL database
+  docker-mysql:
+    # Container name for the service
+    container_name: docker-mysql
+    # Docker image for the service
+    image: mysql
+    # Define the restart policy
+    restart: always
+    # Define environment variables
+    environment:
+      MYSQL_DATABASE: mydb
+      MYSQL_ROOT_PASSWORD: testpass
+      MYSQL_ROOT_HOST: '%'
+    # Map volumes to the host machine
+    volumes:
+      - ./sql:/docker-entrypoint-initdb.d 
+    # Map ports to the host machine
+    ports:
+      - "6666:3306"
+    # Define health check for the container
+    healthcheck:
+      test: "/usr/bin/mysql --user=root --password=testpass --execute \"SHOW DATABASES \""
+      interval: 30s
+      timeout: 10s
+      retries: 5
